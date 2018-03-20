@@ -1,3 +1,6 @@
+import models.Emetteur;
+import models.Pendule;
+
 /****************************************************************
  * Auteur:	    Eric Lefrançois                                 *
  * Groupe:	    HES_SO  Informatique & Télécommunications       *

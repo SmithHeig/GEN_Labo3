@@ -1,4 +1,4 @@
-/********************************************************************
+package models; /********************************************************************
  * Auteur:	    Eric Lefrançois                                     *
  * Groupe:	    HES_SO/EIG  Informatique & Télécommunication        *
  * Fichier:     Pendule.java                                        *
@@ -16,7 +16,7 @@ import javax.swing.*;
 
 
 
-public class Pendule extends JFrame {
+public class Pendule extends JFrame implements Runnable{
 //Classe qui décrit une montre avec un affichage des aiguilles
 	
 	private int dureeSeconde;       // Durée de la seconde en msec.
@@ -25,9 +25,11 @@ public class Pendule extends JFrame {
     private int heures = 0;
     private static int TAILLE = 100; // Taille de la demi-fenétre
     private ToileGraphique toile;
+    private Thread thread;
 
 
-    //------------------------------------------------------------------------
+
+	//------------------------------------------------------------------------
     class ToileGraphique extends JPanel {
 		  
 		  public ToileGraphique() {
@@ -81,6 +83,9 @@ public class Pendule extends JFrame {
         setVisible(true);
 
 	    dureeSeconde = valSeconde;
+
+		thread = new Thread(this);
+		thread.start();
    }
 
     public void incrementerSecondes(){
@@ -97,5 +102,17 @@ public class Pendule extends JFrame {
           heures = ++heures % 24;
       }
     }
+
+	public void run() {
+    	while(true){
+    		try {
+				Thread.sleep(dureeSeconde);
+			} catch(InterruptedException e){
+    			System.err.println(e.getMessage());
+			}
+			incrementerSecondes();
+			toile.repaint();
+		}
+	}
 
 }
