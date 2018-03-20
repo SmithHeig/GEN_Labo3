@@ -14,12 +14,13 @@ import java.awt.*;
 import java.lang.Math;
 import java.awt.event.*;
 import java.util.Observable;
+import java.util.Observer;
 import javax.swing.*;
 
 
 
 
-public class Pendule extends Observable implements Runnable{
+public class Pendule extends Observable implements Runnable, Observer{
 //Classe qui décrit une montre avec un affichage des aiguilles
 	
 	private int dureeSeconde;       // Durée de la seconde en msec.
@@ -27,19 +28,27 @@ public class Pendule extends Observable implements Runnable{
     private int secondes = 0;
     private int heures = 0;
     private Thread thread;
+    private boolean wait;
 
     //------------------------------------------------------------------------
     public Pendule (String nom, int valSeconde, int posX, int posY) {
         addObserver(new VuePendule(nom,posX,posY,this));
 
 	    dureeSeconde = valSeconde;
+	    wait = false;
 
 		thread = new Thread(this);
 		thread.start();
    }
 
     public void incrementerSecondes(){
+        if(wait){
+            System.out.println(secondes);
+        }
     	secondes ++;
+    	if(secondes == 59){
+            wait = true;
+        }
         if (secondes == 60) {   
         	secondes = 0;
         	incrementerMinutes();
@@ -54,16 +63,20 @@ public class Pendule extends Observable implements Runnable{
     }
 
 	public void run() {
-    	while(true){
-    		try {
-				Thread.sleep(dureeSeconde);
-			} catch(InterruptedException e){
-    			System.err.println(e.getMessage());
-			}
-			incrementerSecondes();
-    		setChanged();
-			notifyObservers();
-		}
+    	while(true) {
+            try {
+                Thread.sleep(dureeSeconde);
+            } catch (InterruptedException e) {
+                System.err.println(e.getMessage());
+            }
+
+            if (!wait) {
+                incrementerSecondes();
+
+                setChanged();
+                notifyObservers();
+            }
+        }
 	}
 
 	public int getSecondes(){return secondes;}
@@ -76,4 +89,11 @@ public class Pendule extends Observable implements Runnable{
         return heures + ":" + minutes + ":" + secondes;
     }
 
+    public void update(Observable o, Object arg) {
+        Boolean update = (Boolean) arg;
+        if(update.booleanValue() == true){
+            secondes = 59;
+            wait = false;
+        }
+    }
 }

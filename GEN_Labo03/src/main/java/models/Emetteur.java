@@ -26,19 +26,27 @@ public class Emetteur extends Observable implements Runnable {
 	
   private Thread thread;
 
+
 // Constructeur
     public Emetteur (int dureeSeconde) {
         this.dureeSeconde = dureeSeconde;
 
         addObserver(new VueEmetteur(this));
+
         thread = new Thread(this);
         thread.start();
     }
 
     private void heureMettreAJour () {
+        if(secondes == 59){
+            setChanged();
+            notifyObservers(new Boolean(true)); // update pendule
+        }
+
         secondes = ++secondes % 60;
+
         setChanged();
-        notifyObservers();
+        notifyObservers(new Boolean(false)); // update view
     }
 
     public int getSecondes() {
