@@ -8,12 +8,14 @@ package models; /***************************************************************
 */
 
 
+import views.VueEmetteur;
+
 import javax.swing.*;
 import java.awt.*;
 import java.util.Observable;
 
 
-public class Emetteur extends JFrame implements Runnable {
+public class Emetteur extends Observable implements Runnable {
 
   private final static int LARGEUR = 100;		// largeur fenêtre de l'emetteur
   private final static int HAUTEUR = 100;		// hauteur fenêtre de l'emetteur
@@ -21,32 +23,26 @@ public class Emetteur extends JFrame implements Runnable {
   private int dureeSeconde;                    // Durée sec. en msec.
 
   private int secondes = 0;						// Compteur de secondes
-
-  private JLabel champAffichage = new JLabel("00");
-  private Font fonte = new Font ("TimeRoman",  Font.BOLD, 80);
 	
   private Thread thread;
 
 // Constructeur
     public Emetteur (int dureeSeconde) {
         this.dureeSeconde = dureeSeconde;
-        getContentPane().add("North", champAffichage); 
-        champAffichage.setSize(LARGEUR, HAUTEUR);
-        champAffichage.setFont (fonte);
-        setTitle("Emetteur");
 
-        pack();
-        setLocation(200, 200);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setVisible(true);
-
+        addObserver(new VueEmetteur(this));
         thread = new Thread(this);
         thread.start();
     }
 
     private void heureMettreAJour () {
         secondes = ++secondes % 60;
-        champAffichage.setText (String.valueOf(secondes));
+        setChanged();
+        notifyObservers();
+    }
+
+    public int getSecondes() {
+        return secondes;
     }
 
     public void run() {
