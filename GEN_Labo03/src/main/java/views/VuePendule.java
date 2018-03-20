@@ -69,6 +69,7 @@ public class VuePendule extends JFrame implements Observer{
         button.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 pendule.incrementerMinutes();
+                repaint();
             }
         });
         getContentPane().add(button, BorderLayout.PAGE_START);
